@@ -30,7 +30,7 @@ public class PizzaService {
         return repository.findAll();
     }
     public List<Pizza> listByName(String nome) {
-        return repository.findAllByNome(nome);
+        return repository.findAllByNomeContainingIgnoreCase(nome);
     }
     public List<Pizza> update(Pizza pizza) {
         for(Pizza varPizza : list()) {
