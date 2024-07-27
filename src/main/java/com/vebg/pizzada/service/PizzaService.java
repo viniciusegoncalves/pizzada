@@ -1,8 +1,11 @@
 package com.vebg.pizzada.service;
 
 import com.vebg.pizzada.entity.Pizza;
+import com.vebg.pizzada.exception.AlreadyExistException;
 import com.vebg.pizzada.repository.PizzaRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Objects;
@@ -10,40 +13,45 @@ import java.util.Objects;
 @Service
 public class PizzaService {
     PizzaRepository repository;
+    RuntimeException responseStatusException =  new ResponseStatusException(HttpStatus.NOT_FOUND);
+
+
     public PizzaService(PizzaRepository repository) {
         this.repository = repository;
     }
+
     public List<Pizza> create(Pizza pizza) {
-        for(Pizza varPizza : list()) {
-            if(pizza.getNome() == varPizza.getNome()) {
-                //exception pizza já cadastrada
+        for (Pizza varPizza : list()) {
+            if (pizza.getNome().equalsIgnoreCase(varPizza.getNome())) {
+                throw new AlreadyExistException("Pizza " + varPizza.getNome()
+                        + " já cadastrada!");
             }
         }
-//        if(pizza.getNome() == null || pizza.getDescricao() == null ||
-//        pizza.getPreco() == null) {
-//             A pizza precisa conter todos atributos
-//        }
         repository.save(pizza);
         return list();
     }
-    public List<Pizza> list(){
+
+    public List<Pizza> list() {
         return repository.findAll();
     }
+
     public List<Pizza> listByName(String nome) {
         return repository.findAllByNomeContainingIgnoreCase(nome);
     }
+
     public List<Pizza> update(Pizza pizza) {
-        for(Pizza varPizza : list()) {
+        for (Pizza varPizza : list()) {
             if (Objects.equals(pizza.getId(), varPizza.getId())) {
                 repository.save(pizza);
+                return list();
             }
         }
-        //notFoundException
-        return list();
+        throw responseStatusException;
     }
-    public List<Pizza> delete(Long id){
-        if(repository.findById(id).isEmpty()){
-            //exception id n encontrado;
+
+    public List<Pizza> delete(Long id) {
+        if (repository.findById(id).isEmpty()) {
+            throw responseStatusException;
         }
         repository.deleteById(id);
         return list();
