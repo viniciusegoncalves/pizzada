@@ -3,6 +3,7 @@ package com.vebg.pizzada.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 
 @Entity
@@ -12,6 +13,11 @@ import lombok.*;
 @Getter
 @Setter
 public class Pizza {
+    public Pizza(String nome, String descricao, Double preco) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.preco = preco;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,4 +29,8 @@ public class Pizza {
     @NotNull
     private Double preco;
 
+    @Override
+    public boolean equals(Object obj) {
+        return EqualsBuilder.reflectionEquals(obj, this);
+    }
 }
